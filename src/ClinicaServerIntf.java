@@ -1,4 +1,10 @@
 import java.rmi.*;
+import java.util.Date;
+import java.util.List;
+
 public interface ClinicaServerIntf extends Remote {
-    double add(double d1, double d2) throws RemoteException;
+    boolean reservarConsulta(String especialidade, String clinica, Date Data, String hora) throws RemoteException;
+    boolean cancelarConsulta(int idConsulta) throws RemoteException;
+    List<String> listarConsultas() throws RemoteException;
+
 }
