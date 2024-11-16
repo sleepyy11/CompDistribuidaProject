@@ -13,7 +13,7 @@ import java.util.List;
 public class ClinicaServerImpl extends UnicastRemoteObject
         implements ClinicaServerIntf {
 
-        public static final String DB_URL = "jdbc:mysql://localhost:3306/mydb";
+        public static final String DB_URL = "jdbc:mysql://192.168.56.101:3306/mydb";
         public static final String DB_USER = "root";
         public static final String DB_PASSWORD = "user";
 

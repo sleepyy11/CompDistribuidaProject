@@ -11,7 +11,8 @@ public class ClinicaClient {
             return;
         }
         try {
-            String clinicaServerURL = "rmi://" + args[0] + "/ClinicaServer";
+            //String clinicaServerURL = "rmi://" + args[0] + "/ClinicaServer";
+            String clinicaServerURL = "rmi://" + "192.168.56.101" + "/ClinicaServer";
             ClinicaServerIntf clinicaServerIntf = (ClinicaServerIntf)Naming.lookup(clinicaServerURL);
 
             Scanner scanner = new Scanner(System.in);
