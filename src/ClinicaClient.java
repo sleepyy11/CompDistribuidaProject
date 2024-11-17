@@ -11,8 +11,7 @@ public class ClinicaClient {
             return;
         }
         try {
-            //String clinicaServerURL = "rmi://" + args[0] + "/ClinicaServer";
-            String clinicaServerURL = "rmi://" + "192.168.56.101" + "/ClinicaServer";
+            String clinicaServerURL = "rmi://" + args[0] + "/ClinicaServer";
             ClinicaServerIntf clinicaServerIntf = (ClinicaServerIntf)Naming.lookup(clinicaServerURL);
 
             Scanner scanner = new Scanner(System.in);
@@ -20,16 +19,10 @@ public class ClinicaClient {
             String user;
             String password;
             String passwordConfirm;
-
             while(true){ //APLICAÇÃO A CORRER
-
-                menuInicial();
+                menuAuth();
                 input = scanner.nextLine();
-                if (input.equals("Sair")) {
-                    System.out.println("Até à próxima! :)");
-                    break;
-                }
-                //LOGIN
+                //LOGIN (CASO EFETUADO COM SUCESSO, SAI DO CICLO)
                 if (input.equals("login")) { //LOGIN
                     System.out.println("Digite o seu user:");
                     input = scanner.nextLine();
@@ -40,39 +33,9 @@ public class ClinicaClient {
                     if(!login(user, password)){
                         System.out.println("Login inválido\n");
                     } else {
-                        //PROGRAMA APÓS LOGIN
                         System.out.println("Login efetuado com sucesso!\n");
-                        menuBemVindo();
-                        input = scanner.nextLine();
-                        switch (input) {
-                            case "reservar":
-
-
-
-
-                                break;
-                            case "cancelar":
-
-
-
-
-                                break;
-                            case "listar":
-                                input = scanner.nextLine();
-                                    List<String> listaConsultas = clinicaServerIntf.listarConsultas();
-                                    if (!listaConsultas.isEmpty()) {
-                                        for (String consulta : listaConsultas) {
-                                            System.out.println(consulta);
-                                        }
-                                    } else {
-                                        System.out.println("Não há consultas reservadas");
-                                    }
-                                break;
-                            default:
-                                System.out.println("Entrada inválida");
-                                break;
-                        }
-
+                        //SAI DO MENU DE AUTENTICAO
+                        break;
                     }
                 }
                 //REGISTAR UTILIZADOR
@@ -98,6 +61,36 @@ public class ClinicaClient {
 
                 }
             }
+            while(true){
+                menuPaginaInicial();
+                input = scanner.nextLine();
+                switch (input) {
+                    case "reservar":
+                        break;
+                    case "cancelar":
+                        break;
+                    case "listar":
+                        try {
+                            List<String> listaConsultas = clinicaServerIntf.listarConsultas(user);
+                            if (!listaConsultas.isEmpty()) {
+                                for (String consulta : listaConsultas) {
+                                    System.out.println(consulta);
+                                }
+                            } else {
+                                System.out.println("Não há consultas reservadas");
+                            }
+                        } catch (RemoteException e) {
+                            System.out.println("Erro ao listar consultas: " + e.getMessage());
+                        }
+                        break;
+                    case "sair":
+                        return;
+                    default:
+                        System.out.println("Entrada inválida");
+                        break;
+                }
+
+            }
         }catch(Exception e) {
             System.out.println("Exception: " + e);
             System.out.println("Usage: IP");
@@ -106,8 +99,8 @@ public class ClinicaClient {
 
 
 
-//FUNÇÕES
-    public static void menuInicial(){
+    //FUNÇÕES
+    public static void menuAuth(){
         System.out.println();
         System.out.println("|-------------------------------------------------|");
         System.out.println("| Bem vindo à aplicação de marcação de consultas! |");
@@ -117,16 +110,14 @@ public class ClinicaClient {
         System.out.println("|-------------------------------------------------|");
         System.out.println();
     }
-    public static void menuBemVindo(){
-        System.out.println("|----------------------------------------------------------|");
-        System.out.println("|                         Bem vindo !                      |");
-        System.out.println("|----------------------------------------------------------|");
-        System.out.println("| Digite 'reservar' para iniciar a reserva de uma consulta |");
-        System.out.println("| Digite 'cancelar' para cancelar uma consulta             |");
-        System.out.println("| Digite 'listar' para listar as consultas reservadas      |");
-        System.out.println("|----------------------------------------------------------|");
-
-
+    public static void menuPaginaInicial(){
+        System.out.println("|-------------------------------------------------------------|");
+        System.out.println("|                         Página Inicial                      |");
+        System.out.println("|-------------------------------------------------------------|");
+        System.out.println("| Digite 'reservar' para iniciar a reserva de uma consulta    |");
+        System.out.println("| Digite 'cancelar' para cancelar uma consulta                |");
+        System.out.println("| Digite 'listar' para listar as consultas reservadas         |");
+        System.out.println("|-------------------------------------------------------------|");
     }
     public static boolean registarUtilizador(String user, String password) throws IOException{
         String linha;

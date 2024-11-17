@@ -13,9 +13,9 @@ import java.util.List;
 public class ClinicaServerImpl extends UnicastRemoteObject
         implements ClinicaServerIntf {
 
-        public static final String DB_URL = "jdbc:mysql://192.168.56.101:3306/mydb";
-        public static final String DB_USER = "root";
-        public static final String DB_PASSWORD = "user";
+        public static final String DB_URL = "jdbc:mysql://localhost:3306/mydb";
+        public static final String DB_USER = "user";
+        public static final String DB_PASSWORD = "password";
 
     public ClinicaServerImpl() throws RemoteException {
     }
@@ -33,31 +33,36 @@ public class ClinicaServerImpl extends UnicastRemoteObject
     public boolean cancelarConsulta(int idConsulta) throws RemoteException {
         return false;
     }
-    public List<String> listarConsultas() throws RemoteException {
+    public List<String> listarConsultas(String user) throws RemoteException {
         List<String> consultas = new ArrayList<>();
 
-        // Definir a consulta SQL para listar todas as consultas
-        String sql = "SELECT * FROM Consulta";
+        // query SQL para listar as consultas do user passado por parametro
+        String sql = "SELECT * FROM Consulta WHERE paciente = ?";
 
-        // Estabelecer a conexão com a base de dados
-        try (Connection connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/mydb", DB_USER, DB_PASSWORD);
-             PreparedStatement pstmt = connection.prepareStatement(sql);
-             ResultSet rs = pstmt.executeQuery()) {
+        // estabelecer conexao com a BD
+        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+             PreparedStatement pstmt = connection.prepareStatement(sql)) {
 
-            // Iterar sobre os resultados e adicionar cada consulta à lista
-            while (rs.next()) {
-                // Montar a string com as informações da consulta
-                String consulta = "ID: " + rs.getInt("idConsulta") + ", " +
-                        "Data: " + rs.getDate("data") + ", " +
-                        "Hora: " + rs.getString("hora") + ", " +
-                        "Paciente: " + rs.getString("paciente") +
-                        " (Medico ID: " + rs.getInt("idMedico") + ")";
-                consultas.add(consulta);  // Adiciona a consulta na lista
+            // substituir o ? pelo parametro na query
+            pstmt.setString(1, user);
+
+            // correr a query
+            try (ResultSet rs = pstmt.executeQuery()) {
+                // adicionar cada linha da tabela que corresponde ao resultado da query à lista
+                while (rs.next()) {
+                    String consulta = "- ID da consulta: " + rs.getInt("idConsulta") + "\n" +
+                            "- ID do Médico: " + rs.getInt("idMedico") + "\n" +
+                            "- Data: " + rs.getDate("data") + "\n" +
+                            "- Hora: " + rs.getString("hora") + "\n" +
+                            "- Paciente: " + rs.getString("paciente") + "\n\n";
+                    consultas.add(consulta); // adiciona a consulta na lista
+                }
             }
-
         } catch (SQLException e) {
-            throw new RemoteException("Erro ao listar consultas", e);
+            throw new RemoteException("Erro ao listar consultas para o user: " + user);
         }
-        return consultas;  // Retorna a lista com todas as consultas
+
+        return consultas; // Retorna a lista com as consultas filtradas
     }
+
 }
