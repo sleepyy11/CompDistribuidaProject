@@ -30,8 +30,25 @@ public class ClinicaServerImpl extends UnicastRemoteObject
     }
 
     @Override
-    public boolean cancelarConsulta(int idConsulta) throws RemoteException {
-        return false;
+    public boolean cancelarConsulta(int idConsulta, String user) throws RemoteException {
+        String sql = "DELETE FROM Consulta WHERE idConsulta = ? AND paciente = ?";
+
+        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+             PreparedStatement pstmt = connection.prepareStatement(sql)) {
+
+            // Define os parâmetros na query
+            pstmt.setInt(1, idConsulta);
+            pstmt.setString(2, user);
+
+            // Executa a query
+            int rowsAffected = pstmt.executeUpdate();
+
+            // Verifica se alguma linha foi afetada (consulta encontrada e removida)
+            return rowsAffected > 0;
+
+        } catch (SQLException e) {
+            throw new RemoteException("Erro ao cancelar consulta com ID: " + idConsulta, e);
+        }
     }
     public List<String> listarConsultas(String user) throws RemoteException {
         List<String> consultas = new ArrayList<>();
