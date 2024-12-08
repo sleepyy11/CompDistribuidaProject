@@ -21,13 +21,51 @@ public class ClinicaServerImpl extends UnicastRemoteObject
     }
 
     @Override
-    public boolean reservarConsulta(String especialidade, String clinica, Date Data, String hora) throws RemoteException {
-        Connection conn = null;
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
+    public boolean reservarConsulta(String especialidade, String clinica, String paciente, Date data, String hora) throws RemoteException {
+        String sqlSelectMedicoDisponivel =
+                "SELECT m.idMedico " +
+                        "FROM Medico m " +
+                        "LEFT JOIN Consulta c ON m.idMedico = c.idMedico AND c.data = ? AND c.hora = ? " +
+                        "WHERE m.especialidade = ? AND m.clinica = ? " +
+                        "AND c.idConsulta IS NULL " +
+                        "LIMIT 1";
 
-        return false;
+        String sqlInsertConsulta =
+                "INSERT INTO Consulta (idMedico, paciente, data, hora) " +
+                        "VALUES (?, ?, ?, ?)";
+
+        try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
+             PreparedStatement pstmtSelect = connection.prepareStatement(sqlSelectMedicoDisponivel);
+             PreparedStatement pstmtInsert = connection.prepareStatement(sqlInsertConsulta)) {
+
+            // Define os parâmetros para buscar o médico disponível
+            pstmtSelect.setDate(1, new java.sql.Date(data.getTime()));
+            pstmtSelect.setString(2, hora);
+            pstmtSelect.setString(3, especialidade);
+            pstmtSelect.setString(4, clinica);
+
+            try (ResultSet rs = pstmtSelect.executeQuery()) {
+                if (rs.next()) {
+                    int idMedico = rs.getInt("idMedico");
+
+                    // Define os parâmetros para inserir a consulta
+                    pstmtInsert.setInt(1, idMedico);
+                    pstmtInsert.setString(2, paciente);
+                    pstmtInsert.setDate(3, new java.sql.Date(data.getTime()));
+                    pstmtInsert.setString(4, hora);
+
+                    // Executa a inserção
+                    pstmtInsert.executeUpdate();
+                    return true; // Consulta reservada com sucesso
+                } else {
+                    return false; // Nenhum médico disponível
+                }
+            }
+        } catch (SQLException e) {
+            throw new RemoteException("Erro ao reservar consulta para o paciente: " + paciente, e);
+        }
     }
+
 
     @Override
     public boolean cancelarConsulta(int idConsulta, String user) throws RemoteException {
