@@ -1,8 +1,12 @@
 import java.rmi.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.Scanner;
 import java.io.*;
 public class ClinicaClient {
+    //public static String pathInformacaoLogin = "/home/ubuntu/Documents/clinica/dadoslogin";
     public static String pathInformacaoLogin = "/home/ubuntu/Documents/clinica/dadoslogin";
 
     public static void main(String args[]) {
@@ -66,8 +70,42 @@ public class ClinicaClient {
                 input = scanner.nextLine();
                 switch (input) {
                     case "reservar":
+
+                        System.out.println("Digite a especialidade:");
+                        String especialidade = scanner.nextLine();
+                        System.out.println("Digite a clínica:");
+                        String clinica = scanner.nextLine();
+                        System.out.println("Digite a data (YYYY-MM-DD):");
+                        String dataStr = scanner.nextLine();
+                        System.out.println("Digite a hora (HH:MM):");
+                        String hora = scanner.nextLine();
+
+                        try {
+                            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                            Date data = dateFormat.parse(dataStr);
+
+                            boolean reservado = clinicaServerIntf.reservarConsulta(especialidade, clinica, user, data, hora);
+
+                            if (reservado) {
+                                System.out.println("Consulta reservada com sucesso!");
+                            } else {
+                                System.out.println("Nenhum médico disponível para essa especialidade e horário.");
+                            }
+                        } catch (ParseException e) {
+                            System.out.println("Formato de data inválido.");
+                        }
+
                         break;
                     case "cancelar":
+                        System.out.println("Insira o ID da consulta que deseja cancelar.");
+                        input = scanner.nextLine();
+                        int idConsulta =Integer.parseInt(input);
+                        boolean cancelado = clinicaServerIntf.cancelarConsulta(idConsulta, user);
+                        if(cancelado){
+                            System.out.println("Consulta cancelada com sucesso!");
+                        } else {
+                            System.out.println("Erro ao cancelar consulta.");
+                        }
                         break;
                     case "listar":
                         try {
