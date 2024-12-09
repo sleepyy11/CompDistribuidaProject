@@ -33,7 +33,7 @@ public class ClinicaServerImpl extends UnicastRemoteObject
         String sqlInserirConsulta = "INSERT INTO Consulta (idMedico, data, hora, paciente) VALUES (?, ?, ?, ?)";
 
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            // Passo 1: Obter o ID da clínica
+            //Obter o ID da clinica
             int idClinica;
             try (PreparedStatement pstmtClinica = connection.prepareStatement(sqlBuscarClinicaId)) {
                 pstmtClinica.setString(1, clinica);
@@ -46,7 +46,7 @@ public class ClinicaServerImpl extends UnicastRemoteObject
                 }
             }
 
-            // Passo 2: Buscar todos os médicos disponíveis
+            // Procurar medico disponivel para o horario e especialidade
             try (PreparedStatement pstmtBuscarMedicos = connection.prepareStatement(sqlBuscarMedicos)) {
                 pstmtBuscarMedicos.setDate(1, new java.sql.Date(data.getTime()));
                 pstmtBuscarMedicos.setString(2, hora);
@@ -57,7 +57,7 @@ public class ClinicaServerImpl extends UnicastRemoteObject
                     while (rsMedicos.next()) {
                         int idMedico = rsMedicos.getInt("idMedico");
 
-                        // Passo 3: Inserir consulta para o médico encontrado
+                        // insere consulta para o medico disponivel encontrado
                         try (PreparedStatement pstmtInserirConsulta = connection.prepareStatement(sqlInserirConsulta)) {
                             pstmtInserirConsulta.setInt(1, idMedico);
                             pstmtInserirConsulta.setDate(2, new java.sql.Date(data.getTime()));
@@ -71,9 +71,8 @@ public class ClinicaServerImpl extends UnicastRemoteObject
                 }
             }
 
-            // Se nenhum médico disponível for encontrado
-            throw new RemoteException("Nenhum médico disponível para a especialidade " + especialidade +
-                    " na clínica " + clinica + " em " + data + " às " + hora);
+            // Se nenhum médico disponível for encontrado para aquele horario e especialidade
+            return false;
 
         } catch (SQLException e) {
             throw new RemoteException("Erro ao reservar consulta", e);
@@ -89,15 +88,15 @@ public class ClinicaServerImpl extends UnicastRemoteObject
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD);
              PreparedStatement pstmt = connection.prepareStatement(sql)) {
 
-            // Define os parâmetros na query
+            // definir parametros da query
             pstmt.setInt(1, idConsulta);
             pstmt.setString(2, user);
 
-            // Executa a query
-            int rowsAffected = pstmt.executeUpdate();
+            // executar query
+            int linhasAlteradas = pstmt.executeUpdate();
 
-            // Verifica se alguma linha foi afetada (consulta encontrada e removida)
-            return rowsAffected > 0;
+            // verificar se alguma linha foi afetada (para validar se a consulta foi removida)
+            return linhasAlteradas > 0;
 
         } catch (SQLException e) {
             throw new RemoteException("Erro ao cancelar consulta com ID: " + idConsulta, e);
@@ -106,7 +105,7 @@ public class ClinicaServerImpl extends UnicastRemoteObject
     public List<String> listarConsultas(String user) throws RemoteException {
         List<String> consultas = new ArrayList<>();
 
-        // query SQL para listar as consultas do user passado por parametro
+        // query para listar as consultas do user autenticado
         String sql = "SELECT * FROM Consulta WHERE paciente = ?";
 
         // estabelecer conexao com a BD
@@ -132,7 +131,7 @@ public class ClinicaServerImpl extends UnicastRemoteObject
             throw new RemoteException("Erro ao listar consultas para o user: " + user);
         }
 
-        return consultas; // Retorna a lista com as consultas filtradas
+        return consultas; // retorna a lista com as consultas filtradas
     }
 
 }
