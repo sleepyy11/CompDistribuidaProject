@@ -1,7 +1,9 @@
 import java.rmi.*;
 import java.rmi.server.*;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
+import java.sql.Date;
 import java.rmi.RemoteException;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -21,8 +23,20 @@ public class ClinicaServerImpl extends UnicastRemoteObject
     }
 
 
-    @Override
-    public boolean reservarConsulta(String especialidade, String clinica, String paciente, Date data, String hora) throws RemoteException {
+
+
+    public boolean reservarConsulta(String especialidade, String clinica, String paciente, String data, String hora) throws RemoteException {
+        // Converter a String data ("DD-MM-YYYY") para java.sql.Date
+        Date sqlDate;
+        try {
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd-MM-yyyy");
+            dateFormat.setLenient(false); //garante que a data segue o formato esperado
+            java.util.Date parsedDate = dateFormat.parse(data);
+            sqlDate = new Date(parsedDate.getTime());
+        } catch (ParseException e) {
+            throw new RemoteException("Formato de data inválido: " + data, e);
+        }
+
         String sqlBuscarClinicaId = "SELECT idClinica FROM Clinica WHERE nome = ?";
         String sqlBuscarMedicos = "SELECT m.idMedico " +
                 "FROM Medico m " +
@@ -33,7 +47,7 @@ public class ClinicaServerImpl extends UnicastRemoteObject
         String sqlInserirConsulta = "INSERT INTO Consulta (idMedico, data, hora, paciente) VALUES (?, ?, ?, ?)";
 
         try (Connection connection = DriverManager.getConnection(DB_URL, DB_USER, DB_PASSWORD)) {
-            //Obter o ID da clinica
+            //obter o id  da clinica
             int idClinica;
             try (PreparedStatement pstmtClinica = connection.prepareStatement(sqlBuscarClinicaId)) {
                 pstmtClinica.setString(1, clinica);
@@ -46,9 +60,9 @@ public class ClinicaServerImpl extends UnicastRemoteObject
                 }
             }
 
-            // Procurar medico disponivel para o horario e especialidade
+            //procurar medico disponivel para a data, horario e especialidade
             try (PreparedStatement pstmtBuscarMedicos = connection.prepareStatement(sqlBuscarMedicos)) {
-                pstmtBuscarMedicos.setDate(1, new java.sql.Date(data.getTime()));
+                pstmtBuscarMedicos.setDate(1, sqlDate);
                 pstmtBuscarMedicos.setString(2, hora);
                 pstmtBuscarMedicos.setString(3, especialidade);
                 pstmtBuscarMedicos.setInt(4, idClinica);
@@ -57,10 +71,10 @@ public class ClinicaServerImpl extends UnicastRemoteObject
                     while (rsMedicos.next()) {
                         int idMedico = rsMedicos.getInt("idMedico");
 
-                        // insere consulta para o medico disponivel encontrado
+                        //insere consulta para o medico disponivel encontrado
                         try (PreparedStatement pstmtInserirConsulta = connection.prepareStatement(sqlInserirConsulta)) {
                             pstmtInserirConsulta.setInt(1, idMedico);
-                            pstmtInserirConsulta.setDate(2, new java.sql.Date(data.getTime()));
+                            pstmtInserirConsulta.setDate(2, sqlDate);
                             pstmtInserirConsulta.setString(3, hora);
                             pstmtInserirConsulta.setString(4, paciente);
 
@@ -71,13 +85,14 @@ public class ClinicaServerImpl extends UnicastRemoteObject
                 }
             }
 
-            // Se nenhum médico disponível for encontrado para aquele horario e especialidade
+            //se nenhum medico disponivel for encontrado para aquele horario e especialidade
             return false;
 
         } catch (SQLException e) {
             throw new RemoteException("Erro ao reservar consulta", e);
         }
     }
+
 
 
 
