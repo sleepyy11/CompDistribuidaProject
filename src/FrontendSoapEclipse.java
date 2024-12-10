@@ -1,5 +1,7 @@
-import java.util.Date;
 import java.util.List;
+
+import javax.jws.WebService;
+
 import java.io.*;
 import java.io.IOException;
 import java.net.MalformedURLException;
@@ -7,11 +9,13 @@ import java.rmi.Naming;
 import java.rmi.NotBoundException;
 import java.rmi.RemoteException;
 
-public class FrontendSoapEclipse {
-
-    static String clinicaServerURL = "rmi://" + "192.168.56.102" + "/ClinicaServer";
+@WebService(targetNamespace = "http://default_package/", portName = "ProjFrontendPort", serviceName = "ProjFrontendService")
+public class ProjFrontend {
+    //static String clinicaServerURL = "rmi://" + "192.168.56.102" + "/ClinicaServer"; //Portatil Miguel
+    static String clinicaServerURL = "rmi://" + "192.168.56.101" + "/ClinicaServer"; //PC Ana e Miguel
 
     static String pathInformacaoLogin = "C:\\Users\\migue\\eclipse-workspace\\MathUtilityProject\\src\\dadosUser.txt";
+
 
     public List<String> listarConsultasServer(String user) throws RemoteException, MalformedURLException, NotBoundException{
 
@@ -66,6 +70,9 @@ public class FrontendSoapEclipse {
     }
 
     public boolean registarUtilizador(String user, String password, String passwordRepetida) throws IOException {
+        if(!password.equals(passwordRepetida)) {
+            return false;
+        }
         String linha;
         String userTXT;
         File file = new File(pathInformacaoLogin);
