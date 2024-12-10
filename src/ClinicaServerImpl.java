@@ -96,7 +96,7 @@ public class ClinicaServerImpl extends UnicastRemoteObject
                             pstmtInserirConsulta.setString(4, paciente);
 
                             pstmtInserirConsulta.executeUpdate();
-                            return true; // Consulta reservada com sucesso
+                            return true; //consulta reservada com sucesso
                         }
                     }
                 }

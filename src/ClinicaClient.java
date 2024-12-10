@@ -76,7 +76,7 @@ public class ClinicaClient {
                         String clinica = scanner.nextLine();
                         System.out.println("Digite a data (DD-MM-YYYY):"); // Mudança no formato esperado
                         String dataStr = scanner.nextLine();
-                        System.out.println("Digite a hora (HH:MM):");
+                        System.out.println("Digite a hora entre as 8h e 20h (HH:MM):");
                         String hora = scanner.nextLine();
 
                         try {
