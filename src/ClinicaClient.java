@@ -70,32 +70,28 @@ public class ClinicaClient {
                 input = scanner.nextLine();
                 switch (input) {
                     case "reservar":
-
                         System.out.println("Digite a especialidade:");
                         String especialidade = scanner.nextLine();
                         System.out.println("Digite a clínica:");
                         String clinica = scanner.nextLine();
-                        System.out.println("Digite a data (YYYY-MM-DD):");
+                        System.out.println("Digite a data (DD-MM-YYYY):"); // Mudança no formato esperado
                         String dataStr = scanner.nextLine();
                         System.out.println("Digite a hora (HH:MM):");
                         String hora = scanner.nextLine();
 
                         try {
-                            SimpleDateFormat dateFormat = new SimpleDateFormat("yyyy-MM-dd");
-                            Date data = dateFormat.parse(dataStr);
-
-                            boolean reservado = clinicaServerIntf.reservarConsulta(especialidade, clinica, user, data, hora);
+                            boolean reservado = clinicaServerIntf.reservarConsulta(especialidade, clinica, user, dataStr, hora);
 
                             if (reservado) {
                                 System.out.println("Consulta reservada com sucesso!");
                             } else {
                                 System.out.println("Nenhum médico disponível para essa especialidade e horário.");
                             }
-                        } catch (ParseException e) {
-                            System.out.println("Formato de data inválido.");
+                        } catch (RemoteException e) {
+                            System.out.println("Erro ao reservar consulta: " + e.getMessage());
                         }
-
                         break;
+
                     case "cancelar":
                         System.out.println("Insira o ID da consulta que deseja cancelar.");
                         input = scanner.nextLine();

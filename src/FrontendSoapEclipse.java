@@ -30,14 +30,14 @@ public class FrontendSoapEclipse {
 
     }
 
-    public boolean reservarConsulta(String especialidade, String clinica, String paciente, Date data, String hora)throws IOException, MalformedURLException, NotBoundException{
+    public boolean reservarConsultaServer(String especialidade, String clinica, String paciente, String data, String hora)throws IOException, MalformedURLException, NotBoundException{
 
         ClinicaServerIntf clinicaServerIntf = (ClinicaServerIntf)Naming.lookup(clinicaServerURL);
 
         return clinicaServerIntf.reservarConsulta(especialidade, clinica, paciente, data, hora);
     }
 
-    public static boolean login(String user, String password)throws IOException{
+    public boolean login(String user, String password)throws IOException{
         String linha;
         String userTXT;
         String passwordTXT;
@@ -65,7 +65,7 @@ public class FrontendSoapEclipse {
         return false;
     }
 
-    public static boolean registarUtilizador(String user, String password, String passwordRepetida) throws IOException {
+    public boolean registarUtilizador(String user, String password, String passwordRepetida) throws IOException {
         String linha;
         String userTXT;
         File file = new File(pathInformacaoLogin);

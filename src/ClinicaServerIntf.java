@@ -1,5 +1,4 @@
 import java.rmi.*;
-import java.util.Date;
 import java.util.List;
 
 public interface ClinicaServerIntf extends Remote {

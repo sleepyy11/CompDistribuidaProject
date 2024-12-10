@@ -37,6 +37,23 @@ public class ClinicaServerImpl extends UnicastRemoteObject
             throw new RemoteException("Formato de data inválido: " + data, e);
         }
 
+        //validar horario
+        String[] horaSplit = hora.split(":");
+        if (horaSplit.length != 2) {
+            return false; // horario nao segue o formato "HH:MM"
+        }
+
+        try {
+            int horas = Integer.parseInt(horaSplit[0]);
+            int minutos = Integer.parseInt(horaSplit[1]);
+
+            if (minutos != 0 || horas < 8 || horas > 20) {
+                return false; //horario fora do horario entre as 8h e 20h e com os 0 minutos
+            }
+        } catch (NumberFormatException e) {
+            return false; // formato invalido
+        }
+
         String sqlBuscarClinicaId = "SELECT idClinica FROM Clinica WHERE nome = ?";
         String sqlBuscarMedicos = "SELECT m.idMedico " +
                 "FROM Medico m " +
