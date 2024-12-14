@@ -290,7 +290,7 @@ public class ConsumerREST {
     public static void menuAuth(){
         System.out.println();
         System.out.println("|------------------------------------------------------|");
-        System.out.println("| Bem vindo à aplicação SOAP de marcação de consultas! |");
+        System.out.println("| Bem vindo à aplicação REST de marcação de consultas! |");
         System.out.println("|------------------------------------------------------|");
         System.out.println("| Digite 'login' para iniciar sessão                   |");
         System.out.println("| Não possui conta? Digite 'registar'                  |");
@@ -299,7 +299,7 @@ public class ConsumerREST {
     }
     public static void menuPaginaInicial(){
         System.out.println("|-------------------------------------------------------------|");
-        System.out.println("|                    Página Inicial SOAP                      |");
+        System.out.println("|                    Página Inicial REST                      |");
         System.out.println("|-------------------------------------------------------------|");
         System.out.println("| Digite 'reservar' para iniciar a reserva de uma consulta    |");
         System.out.println("| Digite 'cancelar' para cancelar uma consulta                |");

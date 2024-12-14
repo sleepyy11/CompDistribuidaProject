@@ -1,9 +1,6 @@
 import java.util.List;
 import java.util.Scanner;
 
-import org.apache.cxf.jaxws.JaxWsProxyFactoryBean;
-
-import default_package.ProjFrontend;
 
 public class ConsumerSoap {
 
@@ -106,6 +103,7 @@ public class ConsumerSoap {
                         }
                         break;
                     case "sair":
+                        System.out.println("Até à próxima!");
                         return;
                     default:
                         System.out.println("Entrada inválida");
@@ -139,6 +137,7 @@ public class ConsumerSoap {
         System.out.println("| Digite 'reservar' para iniciar a reserva de uma consulta    |");
         System.out.println("| Digite 'cancelar' para cancelar uma consulta                |");
         System.out.println("| Digite 'listar' para listar as consultas reservadas         |");
+        System.out.println("| Digite 'sair' para terminar a aplicação                     |");
         System.out.println("|-------------------------------------------------------------|");
     }
 

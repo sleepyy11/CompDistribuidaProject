@@ -14,7 +14,7 @@ public class ProjFrontend {
     //static String clinicaServerURL = "rmi://" + "192.168.56.102" + "/ClinicaServer"; //Portatil Miguel
     static String clinicaServerURL = "rmi://" + "192.168.56.101" + "/ClinicaServer"; //PC Ana e Miguel
 
-    static String pathInformacaoLogin = "C:\\Users\\migue\\eclipse-workspace\\MathUtilityProject\\src\\dadosUser.txt";
+    static String pathInformacaoLogin = "C:\\Users\\migue\\eclipse-workspace\\ProjFrontendSoap\\src\\dadoslogin.txt";
 
 
     public List<String> listarConsultasServer(String user) throws RemoteException, MalformedURLException, NotBoundException{
@@ -42,6 +42,7 @@ public class ProjFrontend {
     }
 
     public boolean login(String user, String password)throws IOException{
+
         String linha;
         String userTXT;
         String passwordTXT;
@@ -73,6 +74,19 @@ public class ProjFrontend {
         if(!password.equals(passwordRepetida)) {
             return false;
         }
+        //valida se possui @
+        String[] userPartes = user.split("@");
+        if(userPartes.length != 2) {
+            return false;
+        }
+        // valida se depois do @, é algo do genero de: @example.com
+        String userDomain = userPartes[1];
+        String[] userDomain_Topleveldomain = userDomain.split("\\."); //necessita \\ para contar o "." por ser um caracter especial em exp. regular
+        if(userDomain_Topleveldomain.length != 2) {
+            return false;
+        }
+
+
         String linha;
         String userTXT;
         File file = new File(pathInformacaoLogin);

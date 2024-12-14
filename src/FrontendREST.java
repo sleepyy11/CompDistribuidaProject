@@ -23,8 +23,6 @@ public class ClinicaREST {
 
     static String pathInformacaoLogin = "C:\\Users\\migue\\eclipse-workspace\\ProjFrontendSoap\\src\\dadoslogin.txt";
 
-
-
     @POST
     @Path("/listarConsultas")
     public String listarConsultasServer(String user) throws RemoteException, MalformedURLException, NotBoundException {
@@ -125,6 +123,18 @@ public class ClinicaREST {
         if(!password.equals(passwordRepetida)) {
             return "false";
         }
+        //valida se possui @
+        String[] userPartes = user.split("@");
+        if(userPartes.length != 2) {
+            return "false";
+        }
+        // valida se depois do @, é algo do genero de: @example.com
+        String userDomain = userPartes[1];
+        String[] userDomain_Topleveldomain = userDomain.split("\\."); //necessita \\ para contar o "." por ser um caracter especial em exp. regular
+        if(userDomain_Topleveldomain.length != 2) {
+            return "false";
+        }
+
         String linha;
         String userTXT;
         File file = new File(pathInformacaoLogin);
