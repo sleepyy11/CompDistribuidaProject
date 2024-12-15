@@ -76,7 +76,7 @@ public class ClinicaClient {
                         if (reservado) {
                             System.out.println("Consulta reservada com sucesso!");
                         } else {
-                            System.out.println("Nenhum médico disponível para essa especialidade e horário.");
+                            System.out.println("Nenhum médico com especialidade em " + especialidade + " disponivel na Clinica" + clinica + "na data" + dataStr + "," + hora);
                         }
                         break;
 
@@ -88,7 +88,7 @@ public class ClinicaClient {
                         if (cancelado) {
                             System.out.println("Consulta cancelada com sucesso!");
                         } else {
-                            System.out.println("Erro ao cancelar consulta.");
+                            System.out.println("Não foi possível cancelar a consulta com ID ." + idConsulta);
                         }
                         break;
                     case "listar":
@@ -98,8 +98,12 @@ public class ClinicaClient {
                                 System.out.println(consulta);
                             }
                         } else {
-                            System.out.println("Não há consultas reservadas");
+                            System.out.println("Não tem consultas reservadas");
                         }
+                        break;
+
+                    case "listar especialidades":
+                        listarEspecialidades();
                         break;
                     case "sair":
                         System.out.println("Até à próxima!");
@@ -214,5 +218,18 @@ public class ClinicaClient {
         bufferedWriter.close();
         bufferedReader.close();
         return true;
+    }
+
+    public static void listarEspecialidades(){
+        System.out.println("Clinica Geral");
+        System.out.println("Pediatria");
+        System.out.println("Cardiologia");
+        System.out.println("Ginecologia");
+        System.out.println("Hematologia");
+        System.out.println("Medicina Tropical");
+        System.out.println("Neurologia");
+        System.out.println("Oftalmologia");
+        System.out.println("Oncologia");
+        System.out.println("Otorrinolaringologia");
     }
 }
